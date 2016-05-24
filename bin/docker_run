@@ -1,0 +1,29 @@
+#!/bin/bash
+
+DIR=$(pwd)
+[ $(basename $DIR) == 'bin' ] && echo "Don't run in bin" && exit -1  
+
+if [ ! -e ".bundle/" ] ; then
+  BUNDLE_BASE="bundle_base.tgz"
+  wget http://fabiosammy.com/${BUNDLE_BASE}
+  tar -zxf $BUNDLE_BASE
+  rm $BUNDLE_BASE
+fi
+
+IMAGE="projeto_base"
+[ "$(docker images | grep "$IMAGE")" == "" ] && docker build -t $IMAGE .
+PARAMS="--rm -it --user=1000:1000 -v $DIR:/app"
+
+if [ "$1" == "" ] ; then
+  # --name https://docs.docker.com/engine/reference/run/#name-name
+  # -p https://docs.docker.com/engine/reference/run/#expose-incoming-ports
+  docker run $PARAMS --name $IMAGE -p 3000:3000 $IMAGE
+else
+  # --rm https://docs.docker.com/engine/reference/run/#clean-up-rm
+  # -it https://docs.docker.com/engine/reference/run/#foreground
+  # -P https://docs.docker.com/engine/reference/run/#expose-incoming-ports
+  # --user=1000:1000 https://docs.docker.com/engine/reference/run/#user
+  # --volume=$DIR:/app https://docs.docker.com/engine/reference/run/#volume-shared-filesystems
+  docker run $PARAMS $IMAGE $1
+fi
+
