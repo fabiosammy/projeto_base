@@ -10,7 +10,7 @@ if [ ! -e ".bundle/" ] ; then
   rm $BUNDLE_BASE
 fi
 
-IMAGE="projeto_base"
+IMAGE="projeto_nested"
 [ "$(docker images | grep "$IMAGE")" == "" ] && docker build -t $IMAGE .
 PARAMS="--rm -it --user=1000:1000 -v $DIR:/app"
 
